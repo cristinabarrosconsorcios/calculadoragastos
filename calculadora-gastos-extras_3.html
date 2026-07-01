@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Calculadora de Gastos Extras — Cristina Barros</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0B1E3D;
+    --gold: #D4AF37;
+    --gold-light: #F5E6A3;
+    --gold-dark: #854F0B;
+    --white: #FFFFFF;
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --border: #E3E1D9;
+    --text: #1A1A1A;
+    --text-muted: #6B6B6B;
+    --radius: 10px;
+    --red: #C0392B;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--navy);
+    padding: 48px 24px 40px;
+    text-align: center;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    color: var(--white);
+    font-size: clamp(24px, 5vw, 36px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 14px;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero h1 span { color: var(--gold); }
+  .hero p {
+    color: rgba(255,255,255,0.72);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  /* MAIN */
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 32px 20px 48px;
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-left: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label.food { color: var(--gold-dark); }
+  .section-label.other { color: var(--text-muted); }
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 14px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+
+  /* CATEGORY ROWS */
+  .cat-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+
+  .cat-row {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+
+  .cat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .cat-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .cat-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #FFF7E6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .cat-icon svg { width: 17px; height: 17px; stroke: var(--gold-dark); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  .cat-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy);
+    min-width: 80px;
+    text-align: right;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--navy);
+    border: 2px solid var(--gold);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--navy);
+    border: 2px solid var(--gold);
+    cursor: pointer;
+  }
+
+  /* TOTALS */
+  .totals {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .total-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .total-card.highlight {
+    border: 2px solid var(--gold);
+    background: #FFFCF0;
+  }
+
+  .total-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .total-card.highlight .total-label { color: var(--gold-dark); }
+
+  .total-value {
+    font-size: clamp(15px, 3.5vw, 20px);
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+  }
+
+  /* INSIGHT */
+  .insight {
+    background: #EBF2FF;
+    border-left: 3px solid #185FA5;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+  }
+  .insight p {
+    font-size: 14px;
+    color: #0C447C;
+    line-height: 1.6;
+  }
+  .insight strong { font-weight: 600; }
+
+  /* CTA */
+  .cta-block { text-align: center; }
+  .cta-btn {
+    display: inline-block;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 15px 32px;
+    border-radius: var(--radius);
+    text-decoration: none;
+    border: 2px solid var(--gold);
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    width: 100%;
+    max-width: 400px;
+  }
+  .cta-btn:hover { background: #162D55; transform: translateY(-1px); }
+
+  .cta-sub {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 20px 24px;
+    border-top: 0.5px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  footer strong { color: var(--navy); }
+
+  @media (max-width: 420px) {
+    .hero { padding: 36px 20px 32px; }
+    .totals { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Diagnóstico Financeiro Gratuito</div>
+  <h1>Quanto você gasta em coisas <span>que parecem pequenas?</span></h1>
+  <p>Arraste os controles abaixo e descubra, em segundos, o impacto real dos seus gastos extras mês a mês — e o que você poderia construir com esse dinheiro.</p>
+</div>
+
+<div class="container">
+
+  <p class="section-label food">Alimentação</p>
+  <div class="cat-group" id="group-food"></div>
+
+  <p class="section-label other">Outros gastos</p>
+  <div class="cat-group" id="group-other"></div>
+
+  <div class="totals">
+    <div class="total-card">
+      <p class="total-label">Por mês</p>
+      <p class="total-value" id="out-month">R$ 0</p>
+    </div>
+    <div class="total-card">
+      <p class="total-label">Por ano</p>
+      <p class="total-value" id="out-year">R$ 0</p>
+    </div>
+    <div class="total-card highlight">
+      <p class="total-label">Em 5 anos</p>
+      <p class="total-value" id="out-5y">R$ 0</p>
+    </div>
+  </div>
+
+  <div class="insight">
+    <p id="insight-text">Ajuste os valores acima para ver o seu diagnóstico personalizado.</p>
+  </div>
+
+  <div class="cta-block">
+    <a class="cta-btn" href="https://wa.me/5547997604746?text=Olá%20Cristina!%20Fiz%20o%20diagnóstico%20e%20quero%20entender%20como%20transformar%20esses%20gastos%20em%20patrimônio." target="_blank">
+      Quero transformar isso em patrimônio →
+    </a>
+    <p class="cta-sub">Fale com Cristina Barros — especialista em crédito e consórcio em SC</p>
+  </div>
+
+</div>
+
+<footer>
+  <strong>Cristina Barros</strong> · Especialista em Crédito Consignado e Consórcio ADEMICON · Santa Catarina<br>
+  Esta calculadora é uma ferramenta educativa. Os valores são ilustrativos.
+</footer>
+
+<script>
+const ICONS = {
+  motorbike: `<svg viewBox="0 0 24 24"><path d="M5 16a3 3 0 1 0 6 0 3 3 0 0 0-6 0"/><path d="M13 16a3 3 0 1 0 6 0 3 3 0 0 0-6 0"/><path d="M5 16H3v-2l2-3h7l3-4h3l2 3"/><path d="M9 16V9"/></svg>`,
+  box: `<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+  coffee: `<svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`,
+  bread: `<svg viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>`,
+  tv: `<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>`,
+  cart: `<svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`,
+  card: `<svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
+  glass: `<svg viewBox="0 0 24 24"><path d="M5 3h14l-3 9H8L5 3z"/><path d="M8 12l-1 9h10l-1-9"/></svg>`,
+};
+
+const food = [
+  {name:"Delivery (iFood, Rappi...)", icon:"motorbike", def:200},
+  {name:"Marmitas / quentinha", icon:"box", def:280},
+  {name:"Café (cafeterias, cápsulas)", icon:"coffee", def:120},
+  {name:"Padaria / lanchonete", icon:"bread", def:150},
+];
+const other = [
+  {name:"Streaming (TV, música, jogos)", icon:"tv", def:80},
+  {name:"Compras por impulso", icon:"cart", def:200},
+  {name:"Assinaturas diversas", icon:"card", def:60},
+  {name:"Cigarro, bebida, lazer", icon:"glass", def:150},
+];
+const allCats = [...food, ...other];
+
+function buildGroup(cats, groupId, offset) {
+  const wrap = document.getElementById(groupId);
+  cats.forEach((c, j) => {
+    const i = offset + j;
+    const row = document.createElement('div');
+    row.className = 'cat-row';
+    row.innerHTML = `
+      <div class="cat-header">
+        <div class="cat-name">
+          <div class="cat-icon">${ICONS[c.icon]}</div>
+          ${c.name}
+        </div>
+        <div class="cat-value" id="val-${i}">R$ ${c.def}</div>
+      </div>
+      <input type="range" min="0" max="1500" step="10" value="${c.def}" id="rng-${i}" aria-label="${c.name}" />
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+buildGroup(food, 'group-food', 0);
+buildGroup(other, 'group-other', food.length);
+
+function fmt(n) { return 'R$ ' + Math.round(n).toLocaleString('pt-BR'); }
+
+function recalc() {
+  let total = 0;
+  allCats.forEach((c, i) => {
+    const v = parseInt(document.getElementById(`rng-${i}`).value);
+    document.getElementById(`val-${i}`).textContent = fmt(v);
+    total += v;
+  });
+  document.getElementById('out-month').textContent = fmt(total);
+  document.getElementById('out-year').textContent = fmt(total * 12);
+  document.getElementById('out-5y').textContent = fmt(total * 12 * 5);
+
+  const insight = document.getElementById('insight-text');
+  if (total === 0) {
+    insight.innerHTML = 'Ajuste os valores acima para ver o seu diagnóstico personalizado.';
+  } else if (total < 500) {
+    insight.innerHTML = `Com <strong>${fmt(total)}/mês</strong> em gastos extras, em 5 anos você terá consumido <strong>${fmt(total*12*5)}</strong>. Com esse mesmo valor num consórcio, você poderia ter uma carta de crédito no seu nome.`;
+  } else if (total < 1200) {
+    insight.innerHTML = `Atenção: <strong>${fmt(total)}/mês</strong> parecem pouco, mas somam <strong>${fmt(total*12*5)} em 5 anos</strong>. Direcionado a um consórcio, esse valor já garante um bem real — imóvel ou veículo — sem juros.`;
+  } else {
+    insight.innerHTML = `🚨 <strong>${fmt(total)}/mês</strong> em gastos extras. Em 5 anos: <strong>${fmt(total*12*5)}</strong> consumidos. Esse valor, aplicado em consórcio, poderia quitar um imóvel de médio padrão em Santa Catarina.`;
+  }
+}
+
+allCats.forEach((c, i) => {
+  document.getElementById(`rng-${i}`).addEventListener('input', recalc);
+});
+
+recalc();
+</script>
+</body>
+</html>
